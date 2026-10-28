@@ -228,23 +228,3 @@ Test the entire workflow using both real authorized accounts:
 
 Complete the actual implementation, connect the database, configure authentication, fix all errors, and ensure all buttons, forms, dashboards, and workflows work correctly. Do not stop after creating the UI.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/928475a9-d430-494d-b78d-eb81a1219c6c).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
