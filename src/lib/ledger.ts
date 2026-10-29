@@ -108,6 +108,9 @@ export function useLedgerRealtime() {
       .on("postgres_changes", { event: "*", schema: "public", table: "repayments" }, () =>
         qc.invalidateQueries({ queryKey: ["ledger"] }),
       )
+      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () =>
+        qc.invalidateQueries({ queryKey: ["profiles"] }),
+      )
       .on("postgres_changes", { event: "*", schema: "public", table: "notifications" }, () =>
         qc.invalidateQueries({ queryKey: ["ledger", "notifications"] }),
       )

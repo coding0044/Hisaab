@@ -4,10 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RepayNowButton, RepaymentReviewActions } from "@/components/repayment-actions";
 import type { Repayment, Txn } from "@/lib/ledger";
 
-const { rpc } = vi.hoisted(() => ({ rpc: vi.fn() }));
+const { rpc, invoke } = vi.hoisted(() => ({ rpc: vi.fn(), invoke: vi.fn() }));
 
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { rpc },
+  supabase: { rpc, functions: { invoke } },
 }));
 
 const transaction: Txn = {
@@ -54,6 +54,7 @@ function renderWithQueryClient(element: React.ReactNode) {
 describe("repayment actions", () => {
   beforeEach(() => {
     rpc.mockResolvedValue({ data: "repayment-id", error: null });
+    invoke.mockResolvedValue({ data: { status: "accepted" }, error: null });
   });
 
   afterEach(() => {
@@ -65,9 +66,30 @@ describe("repayment actions", () => {
     const reverseTransaction = { ...transaction, owed_by: "faraz", paid_by: "mir" };
     renderWithQueryClient(
       <>
-        <RepayNowButton transaction={transaction} currentUserId="mir" recipientName="Faraz Ahmed" repayments={[]} />
-        <RepayNowButton transaction={transaction} currentUserId="faraz" recipientName="Faraz Ahmed" repayments={[]} />
-        <RepayNowButton transaction={reverseTransaction} currentUserId="faraz" recipientName="Mir Hassan" repayments={[]} />
+        <RepayNowButton
+          transaction={transaction}
+          currentUserId="mir"
+          currentUserName="Mir Hassan"
+          recipientName="Faraz Ahmed"
+          recipientPhone="+923332853138"
+          repayments={[]}
+        />
+        <RepayNowButton
+          transaction={transaction}
+          currentUserId="faraz"
+          currentUserName="Faraz Ahmed"
+          recipientName="Faraz Ahmed"
+          recipientPhone="+923332853138"
+          repayments={[]}
+        />
+        <RepayNowButton
+          transaction={reverseTransaction}
+          currentUserId="faraz"
+          currentUserName="Faraz Ahmed"
+          recipientName="Mir Hassan"
+          recipientPhone="+923443579010"
+          repayments={[]}
+        />
       </>,
     );
 
@@ -76,11 +98,20 @@ describe("repayment actions", () => {
 
   it("submits a repayment using the existing RPC", async () => {
     renderWithQueryClient(
-      <RepayNowButton transaction={transaction} currentUserId="mir" recipientName="Faraz Ahmed" repayments={[]} />,
+      <RepayNowButton
+        transaction={transaction}
+        currentUserId="mir"
+        currentUserName="Mir Hassan"
+        recipientName="Faraz Ahmed"
+        recipientPhone="+923332853138"
+        repayments={[]}
+      />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Repay Now" }));
-    fireEvent.change(await screen.findByLabelText("Amount to repay (PKR)"), { target: { value: "100" } });
+    fireEvent.change(await screen.findByLabelText("Amount to repay (PKR)"), {
+      target: { value: "100" },
+    });
     fireEvent.change(screen.getByLabelText("Payment method"), { target: { value: "cash" } });
     fireEvent.click(screen.getByRole("button", { name: "Submit Repayment" }));
 
@@ -95,6 +126,17 @@ describe("repayment actions", () => {
         }),
       ),
     );
+    await waitFor(() =>
+      expect(invoke).toHaveBeenCalledWith("whatsapp-notification", {
+        body: { repayment_id: "repayment-id" },
+      }),
+    );
+    const rpcCallOrder = rpc.mock.invocationCallOrder[0];
+    const notificationCallOrder = invoke.mock.invocationCallOrder[0];
+    if (rpcCallOrder === undefined || notificationCallOrder === undefined) {
+      throw new Error("Expected repayment and notification requests");
+    }
+    expect(rpcCallOrder).toBeLessThan(notificationCallOrder);
   });
 
   it("allows only the receiving person to confirm or reject a pending repayment", async () => {

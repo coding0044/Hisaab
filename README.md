@@ -1,5 +1,44 @@
 # Shared Balance
 
+## WhatsApp reminders and repayment notifications
+
+Debt reminders use WhatsApp Click to Chat with the current outstanding amount. Opening the link
+only pre-fills the message; the user must review and press **Send** in WhatsApp.
+
+The `0001_whatsapp_notifications.sql` migration adds the initial contact numbers to the existing
+Faraz Ahmed and Mir Hassan profiles, allows a signed-in user to update only their own WhatsApp
+contact/consent fields, and creates a private notification-attempt log. Apply it to the existing
+Supabase database before deploying the updated app (from this repository, run `npx drizzle-kit migrate`
+with `LOVABLE_DB_MIGRATION_URL` configured in a trusted server/terminal environment). The migration
+requests a PostgREST schema-cache reload at the end. Recipients must explicitly opt in under
+**Settings → WhatsApp contact** before automatic notifications are sent.
+
+Automatic repayment notifications use the official WhatsApp Business Platform Cloud API from the
+`whatsapp-notification` Supabase Edge Function. Deploy the function and configure these server-side
+Supabase function secrets (never add them to `VITE_*` variables or frontend code):
+
+- `WHATSAPP_API_VERSION` (for example, the Graph API version enabled for your Business account)
+- `WHATSAPP_PHONE_NUMBER_ID`
+- `WHATSAPP_ACCESS_TOKEN`
+- `WHATSAPP_TEMPLATE_NAME`
+- `WHATSAPP_TEMPLATE_LANGUAGE` (for example, `en`)
+- `APP_URL` (the public URL of this application)
+
+The selected approved template must have five body placeholders, in order: payer name, amount,
+payee name, payment method, and app URL. For example:
+
+> Payment Notification: {{1}} has submitted a repayment request of PKR {{2}} to {{3}}. Payment
+> method: {{4}}. Status: Awaiting Confirmation. Please open the application to review the request
+> and confirm receipt: {{5}}
+
+Set up the WhatsApp Business sender, verify the recipients, obtain their explicit WhatsApp opt-in,
+and submit/approve the template with Meta before enabling sends. A response accepted by the Cloud
+API is reported as **accepted**, not delivered; delivery requires provider confirmation. Failed
+attempts are logged and can be retried without resending an accepted notification. Uncertain API
+outcomes are not automatically retried because that could create duplicate messages. If the API
+is missing or unavailable, the repayment remains saved and awaiting confirmation, and the submitter
+gets a manual WhatsApp fallback.
+
 Complete Two-Person Loan & Expense Tracking Website
 
 Build a complete, secure, production-ready web application for two friends, Faraz Ahmed and Mir Hassan, to manage shared expenses, personal loans, cash repayments, payment proofs, and outstanding balances.
@@ -227,4 +266,3 @@ Test the entire workflow using both real authorized accounts:
 10. Verify that unauthorized users cannot access the application or its data.
 
 Complete the actual implementation, connect the database, configure authentication, fix all errors, and ensure all buttons, forms, dashboards, and workflows work correctly. Do not stop after creating the UI.
-

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FilePick } from "@/components/ledger-ui";
+import { paymentNotificationMessage, whatsappChatUrl } from "@/lib/whatsapp";
 import {
   availableRepaymentAmount,
   errorMessage,
@@ -20,12 +21,16 @@ import {
 export function RepayNowButton({
   transaction,
   currentUserId,
+  currentUserName,
   recipientName,
+  recipientPhone,
   repayments,
 }: {
   transaction: Txn;
   currentUserId: string;
+  currentUserName: string;
   recipientName: string;
+  recipientPhone: string | null;
   repayments: Repayment[];
 }) {
   const queryClient = useQueryClient();
@@ -62,7 +67,7 @@ export function RepayNowButton({
       const proof = file ? await uploadProof(currentUserId, file) : null;
       const clientRequestId = requestId.current ?? crypto.randomUUID();
       requestId.current = clientRequestId;
-      const { error } = await supabase.rpc("submit_repayment", {
+      const { data: repaymentId, error } = await supabase.rpc("submit_repayment", {
         _transaction_id: transactionId,
         _amount: parsedAmount,
         _method: method,
@@ -79,7 +84,106 @@ export function RepayNowButton({
       if (error) throw error;
 
       requestId.current = null;
-      toast.success("Repayment submitted for confirmation");
+      const fallbackUrl = recipientPhone
+        ? whatsappChatUrl(
+            recipientPhone,
+            paymentNotificationMessage({
+              payerName: currentUserName,
+              payeeName: recipientName,
+              amount: parsedAmount,
+              method,
+            }),
+          )
+        : null;
+      let notificationStatus: string | null = null;
+      let notificationMessage: string | null = null;
+      let notificationError: unknown = null;
+      try {
+        const { data: notification, error } = await supabase.functions.invoke(
+          "whatsapp-notification",
+          {
+            body: { repayment_id: repaymentId },
+          },
+        );
+        notificationError = error;
+        if (!error && notification && typeof notification.status === "string") {
+          notificationStatus = notification.status;
+          if (typeof notification.message === "string") notificationMessage = notification.message;
+        }
+      } catch (error) {
+        notificationError = error;
+      }
+      if (notificationError) {
+        try {
+          const { error: logError } = await supabase.rpc("record_whatsapp_invocation_failure", {
+            _repayment_id: repaymentId,
+            _error:
+              "Could not reach the WhatsApp notification function; delivery outcome is unknown.",
+          });
+          if (logError) console.error("Could not record WhatsApp invocation failure", logError);
+        } catch (error) {
+          console.error("Could not record WhatsApp invocation failure", error);
+        }
+      }
+
+      if (notificationStatus === "accepted") {
+        toast.success(
+          "Repayment saved. WhatsApp accepted the notification; delivery is not yet confirmed.",
+        );
+      } else {
+        const detail =
+          notificationStatus === "not_configured"
+            ? `WhatsApp notification not sent: ${notificationMessage ?? "server configuration or recipient opt-in is missing."}`
+            : notificationError
+              ? "The repayment was saved, but the automatic WhatsApp notification could not be sent."
+              : `The repayment was saved, but WhatsApp did not accept the notification. ${notificationMessage ?? ""}`;
+        toast.error(detail, {
+          description: (
+            <span>
+              The repayment remains saved and is awaiting confirmation.{" "}
+              {fallbackUrl && (
+                <a
+                  href={fallbackUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium underline"
+                >
+                  Open WhatsApp manually
+                </a>
+              )}
+            </span>
+          ),
+          ...(fallbackUrl
+            ? {
+                action: {
+                  label: notificationStatus === "failed" ? "Retry notification" : "Open WhatsApp",
+                  onClick: async () => {
+                    if (notificationStatus !== "failed") {
+                      window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+                      return;
+                    }
+                    const { data: retry, error: retryError } = await supabase.functions.invoke(
+                      "whatsapp-notification",
+                      {
+                        body: { repayment_id: repaymentId },
+                      },
+                    );
+                    if (retryError || retry?.status !== "accepted") {
+                      toast.error(
+                        retry?.message ??
+                          "WhatsApp retry did not complete. The repayment is still saved.",
+                      );
+                      return;
+                    }
+                    toast.success(
+                      "WhatsApp accepted the notification; delivery is not yet confirmed.",
+                    );
+                  },
+                },
+              }
+            : {}),
+        });
+      }
       await queryClient.invalidateQueries({ queryKey: ["ledger"] });
       setOpen(false);
       setAmount("");

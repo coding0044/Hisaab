@@ -8,6 +8,13 @@
       "when": 1793162448134,
       "tag": "0000_ledger_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793248848134,
+      "tag": "0001_whatsapp_notifications",
+      "breakpoints": true
     }
   ]
 }

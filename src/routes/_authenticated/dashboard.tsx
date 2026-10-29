@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Wallet } from "lucide-react";
 import { RepayNowButton, RepaymentReviewActions } from "@/components/repayment-actions";
+import { WhatsAppReminderButton } from "@/components/whatsapp-reminder";
 import {
   availableRepaymentAmount,
   computeBalances,
@@ -44,6 +45,7 @@ function Dashboard() {
         ? `Mir Hassan owes Faraz ${formatPKR(b.net)}`
         : `Faraz owes Mir Hassan ${formatPKR(-b.net)}`;
   const myDebts = txns.filter((t) => t.owed_by === profile.id && Number(t.outstanding) > 0);
+  const debtsOwedToMe = txns.filter((t) => t.paid_by === profile.id && Number(t.outstanding) > 0);
   const incomingRepayments = reps.filter((r) => r.payee === profile.id && r.status === "pending");
 
   return (
@@ -101,10 +103,53 @@ function Dashboard() {
                     <RepayNowButton
                       transaction={t}
                       currentUserId={profile.id}
+                      currentUserName={profile.display_name}
                       recipientName={name(t.paid_by)}
+                      recipientPhone={
+                        profiles.find((person) => person.id === t.paid_by)?.whatsapp_phone ?? null
+                      }
                       repayments={reps}
                     />
                   </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+      <section className="rounded-xl border bg-card p-5 shadow-card">
+        <h2 className="mb-1 font-semibold">Outstanding debts owed to you</h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          WhatsApp opens with a pre-filled reminder. Review it and press Send in WhatsApp.
+        </p>
+        {debtsOwedToMe.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No one currently owes you money.</p>
+        ) : (
+          <div className="divide-y">
+            {debtsOwedToMe.map((t) => {
+              const debtor = profiles.find((p) => p.id === t.owed_by);
+              if (!debtor) return null;
+              return (
+                <div
+                  key={t.id}
+                  className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                >
+                  <Link
+                    to="/history"
+                    search={{ txn: t.id ?? undefined }}
+                    className="min-w-0 flex-1"
+                  >
+                    <p className="truncate text-sm font-medium">{t.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {txnCode(t.ref_no)} · {name(t.owed_by)} owes you {formatPKR(t.outstanding)}
+                    </p>
+                  </Link>
+                  <WhatsAppReminderButton
+                    transaction={t}
+                    currentUserId={profile.id}
+                    debtor={debtor}
+                    creditor={profile}
+                  />
                 </div>
               );
             })}

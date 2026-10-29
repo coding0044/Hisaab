@@ -46,26 +46,40 @@ function AuthPage() {
 
   useEffect(() => {
     let active = true;
-    supabase.auth
-      .getUser()
-      .then(({ data, error }) => {
+    async function checkSession() {
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         if (!active) return;
-        if (error) setError(authErrorMessage(error));
+        if (sessionError) throw sessionError;
+        if (!sessionData.session) {
+          setCheckingSession(false);
+          return;
+        }
+
+        const { data, error: userError } = await supabase.auth.getUser();
+        if (!active) return;
+        if (userError) {
+          setError(authErrorMessage(userError));
+          setCheckingSession(false);
+          return;
+        }
         if (data.user) {
-          navigate({ to: "/dashboard", replace: true });
+          await navigate({ to: "/dashboard", replace: true });
           return;
         }
         setCheckingSession(false);
-      })
-      .catch((sessionError: unknown) => {
+      } catch (sessionError: unknown) {
         if (!active) return;
         setError(
           sessionError instanceof Error
-            ? sessionError.message
+            ? authErrorMessage(sessionError)
             : "Unable to check your sign-in status.",
         );
         setCheckingSession(false);
-      });
+      }
+    }
+
+    void checkSession();
     return () => {
       active = false;
     };
