@@ -26,6 +26,8 @@ const transaction = {
   outstanding: 1000,
   owed_by: mir.id,
   paid_by: faraz.id,
+  description: "Dinner",
+  txn_date: "2026-10-29",
 } as Txn;
 
 describe("WhatsApp helpers", () => {
@@ -38,7 +40,9 @@ describe("WhatsApp helpers", () => {
   it("addresses a reminder to the debtor with the actual outstanding balance", () => {
     const message = reminderMessage(transaction, mir, faraz);
     expect(message).toContain("Hi Mir Hassan!");
-    expect(message).toContain("owe Faraz Ahmed PKR 1,000");
+    expect(message).toContain('expense for "Dinner" on 2026-10-29');
+    expect(message).toContain("Faraz Ahmed originally paid PKR 1,500");
+    expect(message).toContain("remaining balance you owe is PKR 1,000");
     expect(whatsappChatUrl(mir.whatsapp_phone!, message)).toBe(
       `https://wa.me/923443579010?text=${encodeURIComponent(message)}`,
     );

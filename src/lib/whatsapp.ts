@@ -19,9 +19,13 @@ export function whatsappChatUrl(phone: string, message: string): string | null {
 }
 
 export function reminderMessage(transaction: Txn, debtor: Profile, creditor: Profile): string {
-  return `Hi ${debtor.display_name}! Friendly reminder: you currently owe ${creditor.display_name} ${formatWhatsAppPKR(
+  const details = transaction.description ? ` for "${transaction.description}"` : "";
+  const date = transaction.txn_date ? ` on ${transaction.txn_date}` : "";
+  return `Hi ${debtor.display_name}! Friendly reminder about the expense${details}${date}. ${creditor.display_name} originally paid ${formatWhatsAppPKR(
+    transaction.amount,
+  )}. After confirmed repayments, the remaining balance you owe is ${formatWhatsAppPKR(
     transaction.outstanding,
-  )}. Please return the outstanding amount when possible. Once you have paid, submit your repayment request through our website. Thank you!`;
+  )}. Please submit a repayment request through our website after paying. Thank you!`;
 }
 
 export function paymentNotificationMessage({

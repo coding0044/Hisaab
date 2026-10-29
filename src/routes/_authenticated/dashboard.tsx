@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Wallet } from "lucide-react";
 import { RepayNowButton, RepaymentReviewActions } from "@/components/repayment-actions";
+import { PaymentReminderReceipt } from "@/components/payment-reminder-receipt";
 import { WhatsAppReminderButton } from "@/components/whatsapp-reminder";
 import {
   availableRepaymentAmount,
@@ -46,6 +47,7 @@ function Dashboard() {
         : `Faraz owes Mir Hassan ${formatPKR(-b.net)}`;
   const myDebts = txns.filter((t) => t.owed_by === profile.id && Number(t.outstanding) > 0);
   const debtsOwedToMe = txns.filter((t) => t.paid_by === profile.id && Number(t.outstanding) > 0);
+  const debtor = profiles.find((person) => person.id !== profile.id);
   const incomingRepayments = reps.filter((r) => r.payee === profile.id && r.status === "pending");
 
   return (
@@ -118,7 +120,12 @@ function Dashboard() {
         )}
       </section>
       <section className="rounded-xl border bg-card p-5 shadow-card">
-        <h2 className="mb-1 font-semibold">Outstanding debts owed to you</h2>
+        <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">Outstanding debts owed to you</h2>
+          {debtor && debtsOwedToMe.length > 0 && (
+            <PaymentReminderReceipt creditor={profile} debtor={debtor} />
+          )}
+        </div>
         <p className="mb-3 text-xs text-muted-foreground">
           WhatsApp opens with a pre-filled reminder. Review it and press Send in WhatsApp.
         </p>
