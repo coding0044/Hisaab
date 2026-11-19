@@ -18,5 +18,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "server.ts", "lib", "models", "scripts", "types", "vite.config.ts"]
+  "include": ["src", "api", "server.ts", "lib", "models", "scripts", "types", "vite.config.ts"]
 }

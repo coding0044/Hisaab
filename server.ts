@@ -103,15 +103,22 @@ export async function createApp() {
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
 
+  if (process.env.VERCEL === '1' && !isMongoConfigured()) {
+    throw new Error('MONGODB_URI must be configured in Vercel before the API can start.');
+  }
+
   // Seed the 3 registered members idempotently at startup
   await ensureSeeded();
-  await syncDueReminderNotifications().catch(() => undefined);
 
-  // Periodic background check for due reminders (every 60s)
-  const reminderTimer = setInterval(() => {
-    syncDueReminderNotifications().catch(() => undefined);
-  }, 60_000);
-  reminderTimer.unref();
+  if (process.env.VERCEL !== '1') {
+    await syncDueReminderNotifications().catch(() => undefined);
+
+    // Periodic background check for due reminders (every 60s)
+    const reminderTimer = setInterval(() => {
+      syncDueReminderNotifications().catch(() => undefined);
+    }, 60_000);
+    reminderTimer.unref();
+  }
 
   // Apply CSRF / origin check to /api routes
   app.use('/api', verifySameOriginMiddleware);
@@ -538,25 +545,32 @@ export async function createApp() {
   });
 
   // ---------------- VITE / STATIC SERVING ----------------
-  if (process.env.NODE_ENV !== 'production') {
-    const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.resolve(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('/{*path}', (_req, res) => {
-      const indexFile = path.join(distPath, 'index.html');
-      if (fs.existsSync(indexFile)) {
-        res.sendFile(indexFile);
-      } else {
-        res.status(404).send('Build output not found. Run npm run build first.');
-      }
-    });
+  if (process.env.VERCEL !== '1') {
+    if (process.env.NODE_ENV !== 'production') {
+      const { createServer: createViteServer } = await import('vite');
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.resolve(process.cwd(), 'dist');
+      app.use(express.static(distPath));
+      app.get('/{*path}', (_req, res) => {
+        const indexFile = path.join(distPath, 'index.html');
+        if (fs.existsSync(indexFile)) {
+          res.sendFile(indexFile);
+        } else {
+          res.status(404).send('Build output not found. Run npm run build first.');
+        }
+      });
+    }
   }
+
+  app.use((err: any, _req: express.Request, res: Response, _next: NextFunction) => {
+    console.error('Server error:', err);
+    res.status(500).json({ error: err?.message ?? 'Internal server error.' });
+  });
 
   return app;
 }
@@ -564,11 +578,6 @@ export async function createApp() {
 async function startServer() {
   const app = await createApp();
   const PORT = Number(process.env.PORT) || 3000;
-
-  app.use((err: any, _req: express.Request, res: Response, _next: NextFunction) => {
-    console.error('Server error:', err);
-    res.status(500).json({ error: err?.message ?? 'Internal server error.' });
-  });
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Friends Hisaab server listening on http://0.0.0.0:${PORT}`);

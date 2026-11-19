@@ -12,6 +12,8 @@ export default async function handler(req: Request, res: Response): Promise<void
   } catch (error) {
     appPromise = undefined;
     console.error('Failed to initialize API:', error);
-    res.status(500).json({ error: 'Unable to initialize the server.' });
+    res.status(500).json({
+      error: 'API startup failed. Check the Vercel function logs and required environment variables.',
+    });
   }
 }
