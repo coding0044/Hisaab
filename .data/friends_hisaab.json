@@ -1,0 +1,226 @@
+{
+  "users": [
+    {
+      "id": "6afeaf2a6a7f83f906bd547c",
+      "full_name": "Faraz Ahmed",
+      "email": "faraz.maju@gmail.com",
+      "password_hash": "$2b$12$lMLG.EUzZSk.vAtW9IiCc.bMUwxtvEi.oWbEDzj1HzNr0Dxn9y.1O",
+      "phone_number": "03332853138",
+      "international_phone": "923332853138",
+      "avatar_url": "/assets/aistudio/file_00000000fc648211a8aec61bb7a0ad39_22e5610e.png",
+      "is_active": true,
+      "created_at": "2026-11-19T08:11:21.258Z",
+      "updated_at": "2026-11-19T08:11:21.258Z"
+    },
+    {
+      "id": "6afeaf2b6a7f83f906bd547d",
+      "full_name": "Peer Bux",
+      "email": "pirbux388@gmail.com",
+      "password_hash": "$2b$12$TDQ1VBBNH9haaMjNpZH3LOuhM2k2Pnlmil6HEeEP7sF7slEQwo/Gi",
+      "phone_number": "0342 3731281",
+      "international_phone": "923423731281",
+      "avatar_url": "/assets/aistudio/IMG-20261115-WA0018_30474e23.jpg",
+      "is_active": true,
+      "created_at": "2026-11-19T08:11:22.666Z",
+      "updated_at": "2026-11-19T08:11:22.666Z"
+    },
+    {
+      "id": "6afeaf2c6a7f83f906bd547e",
+      "full_name": "Mir Hassan",
+      "email": "mirhassan@gmail.com",
+      "password_hash": "$2b$12$yAy.pmuM8L0wq/HZ31wDauIISWpyPKuydGcIm63CHsk6uMzDVgyDO",
+      "phone_number": "03443579010",
+      "international_phone": "923443579010",
+      "avatar_url": "/assets/aistudio/IMG-20261115-WA0019_1__1416877d.jpg",
+      "is_active": true,
+      "created_at": "2026-11-19T08:11:23.737Z",
+      "updated_at": "2026-11-19T08:33:05.680Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "6afeb00b4ee2ed0e4af18c1e",
+      "sender_id": "6afeaf2a6a7f83f906bd547c",
+      "receiver_id": "6afeaf2c6a7f83f906bd547e",
+      "amount_paisa": 10000,
+      "repaid_amount_paisa": 10000,
+      "currency": "PKR",
+      "transaction_type": "MONEY_GIVEN",
+      "description": "Cash",
+      "notes": "",
+      "transaction_date": "2026-11-19",
+      "status": "PAID",
+      "reversed_transaction_id": null,
+      "idempotency_key": "give_513ca5b2-7c53-4ca0-9c78-caf3b35e900b",
+      "created_by": "6afeaf2a6a7f83f906bd547c",
+      "created_at": "2026-11-19T08:15:07.176Z"
+    },
+    {
+      "id": "6afeb68a0d4c39420619ed56",
+      "sender_id": "6afeaf2a6a7f83f906bd547c",
+      "receiver_id": "6afeaf2c6a7f83f906bd547e",
+      "amount_paisa": 900,
+      "repaid_amount_paisa": 900,
+      "currency": "PKR",
+      "transaction_type": "MONEY_GIVEN",
+      "description": "Loan",
+      "notes": "",
+      "transaction_date": "2026-11-19",
+      "status": "PAID",
+      "reversed_transaction_id": null,
+      "idempotency_key": "give_e1caacb6-1031-4a8e-8c15-34a2c3dd4792",
+      "created_by": "6afeaf2a6a7f83f906bd547c",
+      "created_at": "2026-11-19T08:42:50.776Z"
+    }
+  ],
+  "repayments": [
+    {
+      "id": "6afeb07b4ee2ed0e4af18c25",
+      "transaction_id": "6afeb00b4ee2ed0e4af18c1e",
+      "payer_id": "6afeaf2c6a7f83f906bd547e",
+      "receiver_id": "6afeaf2a6a7f83f906bd547c",
+      "amount_paisa": 10000,
+      "repayment_date": "2026-11-19",
+      "payment_method": "Cash",
+      "description": "Cash",
+      "receipt_number": "FH-RCP-20261119-1019",
+      "is_reversed": false,
+      "idempotency_key": "rep_7f2ceaee-481a-43bd-8686-9a6a3738c558",
+      "created_by": "6afeaf2c6a7f83f906bd547e",
+      "created_at": "2026-11-19T08:16:59.653Z"
+    },
+    {
+      "id": "6afeb6a10d4c39420619ed59",
+      "transaction_id": "6afeb68a0d4c39420619ed56",
+      "payer_id": "6afeaf2c6a7f83f906bd547e",
+      "receiver_id": "6afeaf2a6a7f83f906bd547c",
+      "amount_paisa": 900,
+      "repayment_date": "2026-11-19",
+      "payment_method": "Cash",
+      "description": "cash",
+      "receipt_number": "FH-RCP-20261119-7753",
+      "is_reversed": false,
+      "idempotency_key": "rep_55bc22a6-a049-43dd-a19c-804cd545035d",
+      "created_by": "6afeaf2c6a7f83f906bd547e",
+      "created_at": "2026-11-19T08:43:13.043Z"
+    }
+  ],
+  "reminders": [],
+  "notifications": [
+    {
+      "id": "6afeb00b4ee2ed0e4af18c1f",
+      "user_id": "6afeaf2c6a7f83f906bd547e",
+      "title": "Faraz Ahmed recorded Rs. 100 given to you",
+      "message": "Cash · Date: 2026-11-19",
+      "notification_type": "MONEY_GIVEN",
+      "is_read": true,
+      "related_entity_id": "6afeb00b4ee2ed0e4af18c1e",
+      "created_at": "2026-11-19T08:15:07.176Z"
+    },
+    {
+      "id": "6afeb0394ee2ed0e4af18c22",
+      "user_id": "6afeaf2c6a7f83f906bd547e",
+      "title": "New payment reminder: Cash",
+      "message": "Faraz Ahmed set a reminder for Rs. 100 on 2026-11-19 at 18:00.",
+      "notification_type": "REMINDER",
+      "is_read": true,
+      "related_entity_id": "6afeb0394ee2ed0e4af18c21",
+      "created_at": "2026-11-19T08:15:53.615Z"
+    },
+    {
+      "id": "6afeb07b4ee2ed0e4af18c26",
+      "user_id": "6afeaf2a6a7f83f906bd547c",
+      "title": "Repayment recorded: Rs. 100",
+      "message": "Mir Hassan repaid Rs. 100 to Faraz Ahmed via Cash. Remaining balance: Rs. 0.",
+      "notification_type": "REPAYMENT",
+      "is_read": false,
+      "related_entity_id": "6afeb07b4ee2ed0e4af18c25",
+      "created_at": "2026-11-19T08:16:59.653Z"
+    },
+    {
+      "id": "6afeb68a0d4c39420619ed57",
+      "user_id": "6afeaf2c6a7f83f906bd547e",
+      "title": "Faraz Ahmed recorded Rs. 9 given to you",
+      "message": "Loan · Date: 2026-11-19",
+      "notification_type": "MONEY_GIVEN",
+      "is_read": false,
+      "related_entity_id": "6afeb68a0d4c39420619ed56",
+      "created_at": "2026-11-19T08:42:50.776Z"
+    },
+    {
+      "id": "6afeb6a10d4c39420619ed5a",
+      "user_id": "6afeaf2a6a7f83f906bd547c",
+      "title": "Repayment recorded: Rs. 9",
+      "message": "Mir Hassan repaid Rs. 9 to Faraz Ahmed via Cash. Remaining balance: Rs. 0.",
+      "notification_type": "REPAYMENT",
+      "is_read": false,
+      "related_entity_id": "6afeb6a10d4c39420619ed59",
+      "created_at": "2026-11-19T08:43:13.043Z"
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "6afeb00b4ee2ed0e4af18c20",
+      "user_id": "6afeaf2a6a7f83f906bd547c",
+      "action": "CREATE_MONEY_GIVEN",
+      "entity_type": "Transaction",
+      "entity_id": "6afeb00b4ee2ed0e4af18c1e",
+      "details": "Faraz Ahmed -> Mir Hassan: Rs. 100 (Cash)",
+      "created_at": "2026-11-19T08:15:07.176Z"
+    },
+    {
+      "id": "6afeb0394ee2ed0e4af18c23",
+      "user_id": "6afeaf2a6a7f83f906bd547c",
+      "action": "CREATE_REMINDER",
+      "entity_type": "Reminder",
+      "entity_id": "6afeb0394ee2ed0e4af18c21",
+      "details": "Cash · Rs. 100",
+      "created_at": "2026-11-19T08:15:53.615Z"
+    },
+    {
+      "id": "6afeb0444ee2ed0e4af18c24",
+      "user_id": "6afeaf2a6a7f83f906bd547c",
+      "action": "DELETE_REMINDER",
+      "entity_type": "Reminder",
+      "entity_id": "6afeb0394ee2ed0e4af18c21",
+      "details": "Deleted reminder \"Cash\"",
+      "created_at": "2026-11-19T08:16:04.087Z"
+    },
+    {
+      "id": "6afeb07b4ee2ed0e4af18c27",
+      "user_id": "6afeaf2c6a7f83f906bd547e",
+      "action": "CREATE_REPAYMENT",
+      "entity_type": "Repayment",
+      "entity_id": "6afeb07b4ee2ed0e4af18c25",
+      "details": "Mir Hassan -> Faraz Ahmed: Rs. 100 (FH-RCP-20261119-1019)",
+      "created_at": "2026-11-19T08:16:59.653Z"
+    },
+    {
+      "id": "6afeb4410d4c39420619ed55",
+      "user_id": "6afeaf2c6a7f83f906bd547e",
+      "action": "PROFILE_PHONE_UPDATED",
+      "entity_type": "User",
+      "entity_id": "6afeaf2c6a7f83f906bd547e",
+      "details": "Updated WhatsApp number to 03443579010",
+      "created_at": "2026-11-19T08:33:05.681Z"
+    },
+    {
+      "id": "6afeb68a0d4c39420619ed58",
+      "user_id": "6afeaf2a6a7f83f906bd547c",
+      "action": "CREATE_MONEY_GIVEN",
+      "entity_type": "Transaction",
+      "entity_id": "6afeb68a0d4c39420619ed56",
+      "details": "Faraz Ahmed -> Mir Hassan: Rs. 9 (Loan)",
+      "created_at": "2026-11-19T08:42:50.776Z"
+    },
+    {
+      "id": "6afeb6a10d4c39420619ed5b",
+      "user_id": "6afeaf2c6a7f83f906bd547e",
+      "action": "CREATE_REPAYMENT",
+      "entity_type": "Repayment",
+      "entity_id": "6afeb6a10d4c39420619ed59",
+      "details": "Mir Hassan -> Faraz Ahmed: Rs. 9 (FH-RCP-20261119-7753)",
+      "created_at": "2026-11-19T08:43:13.043Z"
+    }
+  ]
+}
