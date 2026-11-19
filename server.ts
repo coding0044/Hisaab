@@ -96,9 +96,8 @@ async function requireAuth(
   }
 }
 
-async function startServer() {
+export async function createApp() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
 
   app.set('trust proxy', 1);
   app.use(express.json({ limit: '1mb' }));
@@ -549,7 +548,7 @@ async function startServer() {
   } else {
     const distPath = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
+    app.get('/{*path}', (_req, res) => {
       const indexFile = path.join(distPath, 'index.html');
       if (fs.existsSync(indexFile)) {
         res.sendFile(indexFile);
@@ -558,6 +557,13 @@ async function startServer() {
       }
     });
   }
+
+  return app;
+}
+
+async function startServer() {
+  const app = await createApp();
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use((err: any, _req: express.Request, res: Response, _next: NextFunction) => {
     console.error('Server error:', err);
@@ -569,7 +575,9 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
-  console.error('Fatal startup failure:', err);
-  process.exit(1);
-});
+if (process.env.VERCEL !== '1') {
+  startServer().catch((err) => {
+    console.error('Fatal startup failure:', err);
+    process.exit(1);
+  });
+}
