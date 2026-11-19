@@ -13,7 +13,11 @@ export default async function handler(req: Request, res: Response): Promise<void
     appPromise = undefined;
     console.error('Failed to initialize API:', error);
     res.status(500).json({
-      error: 'API startup failed. Check the Vercel function logs and required environment variables.',
+      error:
+        error instanceof Error &&
+        error.message === 'MONGODB_URI must be configured in Vercel before the API can start.'
+          ? error.message
+          : 'API startup failed. Check the Vercel function logs and required environment variables.',
     });
   }
 }

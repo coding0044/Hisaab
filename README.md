@@ -29,6 +29,10 @@ Required variables:
 - `AUTH_SECRET` / `NEXTAUTH_SECRET`: 32+ character random signing secret
 - `SEED_PASSWORD_FARAZ`, `SEED_PASSWORD_PEER_BUX`, `SEED_PASSWORD_MIR_HASSAN` (optional overrides for the configured initial member passwords)
 
+## Vercel Deployment
+
+Vercel serves the Vite frontend and routes `/api/*` to the Express API function in `api/[...path].ts`. Add `MONGODB_URI`, `DATABASE_NAME`, and `AUTH_SECRET` to the Vercel project's Environment Variables for each deployment environment, and allow the deployment to connect to MongoDB Atlas. The local `.env` file is not deployed. Redeploy after changing environment variables.
+
 ## Commands
 
 ```bash
